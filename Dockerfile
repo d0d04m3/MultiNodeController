@@ -18,7 +18,8 @@ ENV APPID=${NR_APP_ID}
 
 
 USER root
-RUN chown -R node-red:root /data
+RUN chown -R node-red:root /data && chmod -R g+rwX /data && \
+    chown -R node-red:root /usr/src/node-red && chmod -R g+rwX /usr/src/node-red
 #RUN echo "192.168.33.11    mynginx" >> /etc/hosts
 
 USER node-red
@@ -34,10 +35,16 @@ WORKDIR /usr/src/node-red
 RUN npm install --no-fund --no-update-notifier --save node-red-contrib-storage-mongodb
 COPY settings.js /data/
 COPY flows.json  /data/flows.json
+USER root
+#RUN chmod ugo+rw /data/package.json
+RUN chown -R node-red:root /data/package.json
+#RUN chmod ugo+rw /data/flows.json
+RUN chown -R node-red:root /data/flows.json
+RUN chown -R node-red:root /data/settings.js
+USER node-red
 # Env variables
 
     
 #RUN npm install --no-fund --no-update-notifier --save node-red-mongo-storage-plugin
 ENTRYPOINT npm start --  --userDir /data
 #CMD ["npm", "start"]
-
